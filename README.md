@@ -48,13 +48,25 @@ Vérifier **uniquement par agrégats**, sans jamais afficher la colonne `cible` 
 
 ```sql
 select count(*) filter (where cible is null), count(distinct cible), count(*) filter (where cible = prenom)
-from public.darons;                                   -- attendu : 0, 12, 0
+from public.darons;                                   -- attendu : 0, nombre de participants, 0
 
 select count(*) from public.darons d join public.exclusions e
   on (d.prenom = e.a and d.cible = e.b) or (d.prenom = e.b and d.cible = e.a);   -- attendu : 0
 ```
 
 À partir de là, ne plus jamais lire `cible` : ni `select *`, ni export, ni ouverture de la table dans le dashboard.
+
+## Ajouter un participant après le début des tirages
+
+```sql
+select public.ajouter_daron('Prénom exact');                    -- sans couple
+select public.ajouter_daron('Prénom exact', 'Prénom du conjoint'); -- avec couple
+```
+
+La fonction choisit au hasard une personne qui n'a pas encore tiré (Y). Le nouveau reprend la cible de Y,
+et Y offre désormais au nouveau. Ceux qui ont déjà tiré gardent leur résultat ; les couples sont respectés.
+Il faut donc qu'au moins une personne n'ait pas encore tiré (sinon erreur `AJOUT_IMPOSSIBLE`).
+Vérifier ensuite avec les deux requêtes d'agrégats ci-dessus. Cette fonction n'est pas appelable depuis le site.
 
 ## Limites
 

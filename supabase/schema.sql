@@ -191,6 +191,62 @@ end;
 $$;
 
 -- ---------------------------------------------------------------------------
+-- ajouter_daron(p_prenom, p_partenaire) : ajoute un participant après le début
+-- des tirages, sans changer le résultat de ceux qui ont déjà tiré.
+-- On choisit au hasard Y, qui n'a pas encore tiré ; le nouveau reprend la cible
+-- de Y, et Y offre désormais au nouveau. Ne renvoie rien : aucune cible ne sort.
+-- ---------------------------------------------------------------------------
+
+create or replace function public.ajouter_daron(p_prenom text, p_partenaire text default null)
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_y public.darons%rowtype;
+begin
+  -- === ÉTAPE 1 : CONTRÔLES ===
+  if exists (select 1 from public.darons where prenom = p_prenom) then
+    raise exception 'PRENOM_DEJA_PRESENT';
+  end if;
+  if not exists (select 1 from public.darons)
+     or exists (select 1 from public.darons where cible is null) then
+    raise exception 'TIRAGE_PAS_PRET';
+  end if;
+
+  -- === ÉTAPE 2 : INSCRIPTION DU NOUVEAU ET DE SON COUPLE ===
+  insert into public.darons (id, prenom, ordre)
+  select max(id) + 1, p_prenom, max(ordre) + 1 from public.darons;
+
+  if p_partenaire is not null then
+    insert into public.exclusions (a, b) values (p_prenom, p_partenaire);
+  end if;
+
+  -- === ÉTAPE 3 : CHOIX DE Y PARMI CEUX QUI N'ONT PAS ENCORE TIRÉ ===
+  select d.* into v_y
+  from public.darons d
+  where d.jeton is null
+    and d.prenom <> p_prenom
+    and d.cible is not null
+    and not exists (select 1 from public.exclusions e
+                    where (e.a = p_prenom and e.b in (d.prenom, d.cible))
+                       or (e.b = p_prenom and e.a in (d.prenom, d.cible)))
+  order by gen_random_uuid()
+  limit 1
+  for update;
+
+  if not found then
+    raise exception 'AJOUT_IMPOSSIBLE';
+  end if;
+
+  -- === ÉTAPE 4 : INSERTION DANS LA CHAÎNE ===
+  update public.darons set cible = v_y.cible where prenom = p_prenom;
+  update public.darons set cible = p_prenom  where id = v_y.id;
+end;
+$$;
+
+-- ---------------------------------------------------------------------------
 -- Droits d'exécution : tout retirer, puis n'ouvrir que le strict nécessaire.
 -- ---------------------------------------------------------------------------
 
@@ -198,6 +254,7 @@ revoke execute on function public.liste_darons()        from public, anon, authe
 revoke execute on function public.tirer(text, uuid)      from public, anon, authenticated;
 revoke execute on function public.generer_tirage()       from public, anon, authenticated, service_role;
 revoke execute on function public.liberer(text)          from public, anon, authenticated, service_role;
+revoke execute on function public.ajouter_daron(text, text) from public, anon, authenticated, service_role;
 
 grant execute on function public.liste_darons()   to anon;
 grant execute on function public.tirer(text, uuid) to anon;
