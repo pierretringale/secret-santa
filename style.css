@@ -1,0 +1,346 @@
+/* Le Noël des Darons : rendu de docs/maquette-reference.html, en largeur fluide. */
+
+@font-face { font-family: "Lobster"; src: url("assets/fonts/lobster-400.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Bebas Neue"; src: url("assets/fonts/bebas-neue-400.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Barlow"; src: url("assets/fonts/barlow-400.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Barlow"; src: url("assets/fonts/barlow-500.woff2") format("woff2"); font-weight: 500; font-display: swap; }
+@font-face { font-family: "Barlow"; src: url("assets/fonts/barlow-600.woff2") format("woff2"); font-weight: 600; font-display: swap; }
+@font-face { font-family: "Barlow"; src: url("assets/fonts/barlow-700.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+
+:root {
+  --fond: #0E1E26;
+  --creme: #F3E3BC;
+  --rouge: #B32D24;
+  --rouge-ombre: #6E1712;
+  --vert: #1F6B5A;
+  --or: #E0A93B;
+  --encre: #12222B;
+  --secondaire: #A9B4A6;
+  --filet: #5C6E70;
+  --lobster: "Lobster", cursive;
+  --bebas: "Bebas Neue", sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--fond);
+  color: var(--creme);
+  font-family: "Barlow", system-ui, sans-serif;
+}
+
+[hidden] { display: none !important; }
+
+button { font-family: inherit; }
+
+:focus-visible { outline: 3px solid var(--or); outline-offset: 3px; }
+h1:focus { outline: none; }
+
+/* Colonne centrée : 390 px au plus, toute la largeur en dessous. */
+.ecran {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  max-width: 390px;
+  min-height: 100vh;
+  min-height: 100svh;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.etoile { position: absolute; pointer-events: none; }
+
+/* ---------------- Accueil ---------------- */
+
+.accueil { padding: 28px 22px 32px; gap: 20px; }
+
+.entete { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+
+.vignette {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 3px solid var(--or);
+}
+
+.titre-accueil {
+  margin: 0;
+  font-family: var(--lobster);
+  font-weight: 400;
+  font-size: 42px;
+  line-height: 1;
+  text-align: center;
+}
+
+.pastille {
+  background: var(--rouge);
+  font-family: var(--bebas);
+  font-size: 18px;
+  letter-spacing: 2.5px;
+  padding: 5px 16px 3px;
+  border-radius: 999px;
+  transform: rotate(-2deg);
+}
+
+.regles {
+  background: var(--creme);
+  color: var(--encre);
+  border-radius: 14px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.regles h2 {
+  margin: 0;
+  font-family: var(--bebas);
+  font-weight: 400;
+  font-size: 22px;
+  letter-spacing: 1.5px;
+  text-align: center;
+}
+
+.regles ol { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 9px; }
+.regles li { display: flex; gap: 10px; font-size: 15px; line-height: 1.4; }
+.regles .num { font-family: var(--bebas); font-size: 20px; line-height: 1.1; color: var(--rouge); width: 14px; flex-shrink: 0; }
+
+.qui { display: flex; flex-direction: column; gap: 12px; }
+
+.qui h2 {
+  margin: 0;
+  font-family: var(--lobster);
+  font-weight: 400;
+  font-size: 30px;
+  line-height: 1;
+}
+
+.grille { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; min-height: 50px; }
+
+.prenom {
+  height: 50px;
+  border: 2px solid var(--filet);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--creme);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.prenom svg { display: none; flex-shrink: 0; }
+
+.prenom[aria-pressed="true"] {
+  border-color: var(--creme);
+  background: var(--creme);
+  color: var(--encre);
+  font-weight: 700;
+}
+.prenom[aria-pressed="true"] svg { display: block; }
+
+/* État absent de la maquette : prénom déjà tiré. */
+.prenom:disabled {
+  opacity: 0.4;
+  text-decoration: line-through;
+  cursor: not-allowed;
+}
+
+/* État absent de la maquette : message d'erreur. */
+.message {
+  margin: 0;
+  border: 2px solid var(--rouge);
+  background: rgba(179, 45, 36, 0.18);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 15px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.confirmation {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.45;
+  text-align: center;
+}
+.confirmation strong { color: var(--or); }
+/* Tant qu'aucun prénom n'est choisi, la phrase garde sa place sans s'afficher. */
+.confirmation.inactive { visibility: hidden; }
+
+.lancer {
+  height: 60px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--rouge);
+  color: var(--creme);
+  font-family: var(--lobster);
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: pointer;
+  box-shadow: 0 5px 0 var(--rouge-ombre);
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.lancer:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 2px 0 var(--rouge-ombre); }
+
+/* État absent de la maquette : bouton inactif. */
+.lancer:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.note {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--secondaire);
+  text-align: center;
+}
+
+/* ---------------- Attente ---------------- */
+
+.attente {
+  padding: 40px 26px 36px;
+  align-items: center;
+  justify-content: center;
+  gap: 26px;
+}
+
+.surtitre {
+  margin: 0;
+  font-family: var(--bebas);
+  font-size: 19px;
+  letter-spacing: 3px;
+  color: var(--or);
+}
+
+.verre { animation: tangue 1.8s ease-in-out infinite; transform-origin: 50% 92%; max-width: 100%; height: auto; }
+
+.attente-bloc { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+
+.titre-attente {
+  margin: 0;
+  font-family: var(--lobster);
+  font-weight: 400;
+  font-size: 46px;
+  line-height: 1.05;
+  text-align: center;
+}
+
+.points { display: flex; gap: 10px; }
+.points span { width: 12px; height: 12px; border-radius: 50%; background: var(--or); animation: point 1.4s infinite; }
+.points span:nth-child(2) { animation-delay: 0.2s; }
+.points span:nth-child(3) { animation-delay: 0.4s; }
+
+.note-attente { margin: 0; font-size: 14px; line-height: 1.45; color: var(--secondaire); text-align: center; }
+
+@keyframes tangue { 0%, 100% { transform: rotate(-8deg); } 50% { transform: rotate(8deg); } }
+@keyframes point { 0%, 80%, 100% { opacity: 0.25; } 40% { opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .bouge { animation: none !important; }
+  .points span { opacity: 1; }
+}
+
+/* ---------------- Résultat ---------------- */
+
+.resultat {
+  padding: 44px 22px 32px;
+  align-items: center;
+  gap: 24px;
+}
+
+.resultat-entete {
+  position: relative;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.titre-resultat {
+  margin: 0;
+  font-family: var(--lobster);
+  font-weight: 400;
+  font-size: 34px;
+  line-height: 1.1;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.offre { margin: 0; font-size: 17px; }
+
+.etiquette {
+  position: relative;
+  width: 318px;
+  max-width: calc(100% - 16px);
+  margin-top: 18px;
+  transform: rotate(-4deg);
+}
+
+.ruban { position: absolute; top: -50px; left: 6px; }
+
+.etiquette-carte {
+  background: var(--creme);
+  color: var(--encre);
+  border-radius: 18px;
+  padding: 14px;
+  box-shadow: 0 8px 0 #091318;
+}
+
+.etiquette-cadre {
+  position: relative;
+  border: 2px dashed var(--encre);
+  border-radius: 12px;
+  padding: 26px 12px 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.trou {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--fond);
+}
+
+.pour { font-family: var(--bebas); font-size: 17px; letter-spacing: 3px; color: var(--vert); }
+
+.cible {
+  font-family: var(--lobster);
+  font-size: 66px;
+  line-height: 1;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.infos {
+  width: 100%;
+  margin-top: 14px;
+  border: 2px solid var(--creme);
+  border-radius: 14px;
+  padding: 14px 18px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.infos > div { display: flex; flex-direction: column; gap: 2px; }
+.infos-etiquette { font-family: var(--bebas); font-size: 16px; letter-spacing: 1.5px; color: var(--or); }
+.infos-valeur { font-size: 21px; font-weight: 700; }

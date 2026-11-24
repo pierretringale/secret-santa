@@ -1,0 +1,6 @@
+# La maquette contient les vrais prénoms : elle reste en local.
+docs/maquette-reference.html
+# Le brief contient les vrais prénoms : ne jamais le committer.
+brief*.md
+.claude/
+.DS_Store
